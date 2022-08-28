@@ -1,3 +1,5 @@
+import html
+
 import pandas
 from asyncpraw.models import Submission, Comment, Subreddit
 
@@ -39,8 +41,20 @@ class TrainingRow(object):
 		return self
 
 	def set_training_text(self, training: str):
-		self.TrainingString = training + '<|endoftext|>'
+		text = self.clean_text(training)
+		self.TrainingString = text + '<|endoftext|>'
 		return self
 
 	def to_df(self) -> pandas.DataFrame:
 		return pandas.DataFrame(self.__dict__, index=[0])
+
+	@staticmethod
+	def clean_text(text) -> str:
+		if text is None:
+			text = ""
+		# have to unescape it twice, for reason I don't fully understand
+		text = html.unescape(text)
+		text = html.unescape(text)
+		# Strip and whitespace off of the end
+		text = text.strip()
+		return text

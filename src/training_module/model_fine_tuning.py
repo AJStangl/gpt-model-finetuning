@@ -17,14 +17,14 @@ class ModelFineTuner:
 		self.bot_label: str = bot_label
 		self.training_arguments: dict = self.get_training_arguments(self.bot_label)
 
-	def get_model(self) -> LanguageModelingModel:
+	def get_gpt2_model(self) -> LanguageModelingModel:
 		model = LanguageModelingModel(model_type=self.training_arguments['model_type'],
 									  model_name=self.training_arguments['model_name'],
 									  args=self.training_arguments,
 									  use_cuda=True, cuda_device="1")
 		return model
 
-	def get_existing_model(self, model_path: str) -> LanguageModelingModel:
+	def get_existing_gpt2_model(self, model_path: str) -> LanguageModelingModel:
 		model = LanguageModelingModel(self.training_arguments['model_type'],
 									  model_path,
 									  args=self.training_arguments,
@@ -37,11 +37,10 @@ class ModelFineTuner:
 		model.train_model(train_file=train_file, eval_file=eval_file, args=self.training_arguments)
 
 	@staticmethod
-	def generate_text_training_data(training_data: str, bot_label: str) -> Tuple[str, str]:
+	def generate_text_training_data(training_data: str, bot_label: str, subreddits: [str]) -> Tuple[str, str]:
 		train_text_file = f'{bot_label}_train.txt'
 		eval_text_file = f'{bot_label}_eval.txt'
 
-		subreddits = ["onlyfansadvice", "CreatorsAdvice"]
 		df = pandas.read_csv(training_data)
 
 		df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
@@ -67,11 +66,11 @@ class ModelFineTuner:
 		eval_df = filtered.where(~filtered['CommentId'].isin(train_ids))
 		eval_df.dropna(inplace=True, subset=['Subreddit'])
 
-		training_text = train_df["TrainingString"].apply(lambda x: x.replace('\n', '\\n'))
-		eval_text = eval_df["TrainingString"].apply(lambda x: x.replace('\n', '\\n'))
+		training_text = train_df["TrainingString"].apply(lambda x: x.replace('\n', "\\n"))
+		eval_text = eval_df["TrainingString"].apply(lambda x: x.replace('\n', "\\n"))
 
-		training_text.to_csv(train_text_file, index=False, header=False, line_terminator='\n', encoding="utf-8", escapechar='\\', quoting=csv.QUOTE_NONE)
-		eval_text.to_csv(eval_text_file, index=False, header=False, line_terminator='\n', encoding="utf-8", escapechar='\\', quoting=csv.QUOTE_NONE)
+		# training_text.to_csv(train_text_file, index=False, header=False, line_terminator='\n', encoding="utf-8", escapechar='\\', quoting=csv.QUOTE_NONE)
+		# eval_text.to_csv(eval_text_file, index=False, header=False, line_terminator='\n', encoding="utf-8", escapechar='\\', quoting=csv.QUOTE_NONE)
 
 		return train_text_file, eval_text_file
 
@@ -116,7 +115,7 @@ class ModelFineTuner:
 			# Most of the time we'll only get a K80 on free Colab
 			model_args['train_batch_size'] = 1
 			# Need to train for multiple epochs because of the small batch size
-			model_args['num_train_epochs'] = 6
+			model_args['num_train_epochs'] = 12
 			model_args["gradient_accumulation_steps"] = 100
 			# Save every 3000 to conserve disk space
 			model_args["evaluate_during_training_steps"] = int(3000 / model_args["gradient_accumulation_steps"])

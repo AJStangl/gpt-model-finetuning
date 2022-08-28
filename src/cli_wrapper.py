@@ -21,7 +21,7 @@ def cli3():
 	pass
 
 @cli1.command()
-@click.option("--sub", prompt='specify a single subreddit name')
+@click.option("--sub", prompt='specify a single subreddit name', default='onlyfansadvice')
 async def get_fine_tuning(sub: str):
 	"""Command for downloading finetuning data"""
 	collector: FineTuningDataCollector = FineTuningDataCollector()
@@ -38,7 +38,7 @@ async def train_model(bot_label: str, data: str):
 	train_file = "D:\\code\\repos\\quick_training\\only_fans_2_train.txt"
 	eval_file = "D:\\code\\repos\\quick_training\\only_fans_2_eval.txt"
 
-	model = model_fine_tuner.get_model()
+	model = model_fine_tuner.get_gpt2_model()
 
 	model_fine_tuner.train_model(model, train_file=train_file, eval_file=eval_file)
 
@@ -46,7 +46,7 @@ async def train_model(bot_label: str, data: str):
 async def gen_text():
 	model_path: str = "D:\\code\\repos\\quick_training\\only_fans_bot_2\\best_model"
 	text_generator: ModelTextGenerator = ModelTextGenerator()
-	text_generator.generate_text_with_no_wrapper(model_path, "<|sols r/ExtremeCombat|><|sot|>How are you doing today?<|eot|><|sol|>It feels nice out right?<|eol|><|sor|>")
+	text_generator.generate_text_with_no_wrapper(model_path, "<|sor u/CoopBot-GPT2|>Black cherry merlot. I like it<|eor|><|soopr u/GaryBot-GPT2|>I love the packaging! And the smell. I'm so excited.<|eoopr|><|sor u/None|>[removed]<|eor|><|sor u/PabloBot-GPT2|>I think you need a bottle of red wine or a nice perfume to feel better.<|eor|><|soopr u/GaryBot-GPT2|>r/youse_the_fckinsthebox<|eoopr|><|sor u/sub_doesnt_exist_bot|>The subreddit r/youse_the_fckinsthebox does not exist. Maybe there's a typo?\n\nConsider [**creating a new subreddit** r/youse_the_fckinsthebox](/subreddits/create?name=youse_the_fckinsthebox).\n\n---\n^(\ud83e\udd16 this comment was written by a bot. beep boop \ud83e\udd16)\n\n^(feel welcome to respond 'Bad bot'/'Good bot', it's useful feedback.)\n^[github](https://github.com/Toldry/RedditAutoCrosspostBot) ^| ^[Rank](https://botranks.com?bot=sub_doesnt_exist_bot)<|eor|><|sor|>")
 
 cli = click.CommandCollection(sources=[cli1, cli2, cli3])
 
