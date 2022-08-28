@@ -32,7 +32,9 @@ async def train_model(bot_label: str, data: str):
 	"""Command for running fine-tuning for gpt-2 model"""
 	model_fine_tuner = ModelFineTuner(bot_label)
 
-	train_file, eval_file = model_fine_tuner.generate_text_training_data(data, bot_label)
+	# train_file, eval_file = model_fine_tuner.generate_text_training_data(data, bot_label)
+	train_file = "D:\\code\\repos\\quick_training\\only_fans_2_train.txt"
+	eval_file = "D:\\code\\repos\\quick_training\\only_fans_2_eval.txt"
 
 	model = model_fine_tuner.get_model()
 

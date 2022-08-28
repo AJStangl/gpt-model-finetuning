@@ -5,30 +5,30 @@ import os
 
 
 def main():
-	df = pandas.read_csv("training.csv")
+	# df = pandas.read_csv("training.csv")
 	bot_label = 'only_fans_bot_2'
-	train_text_file = "train.txt"
-	eval_text_file = "eval.txt"
-
-	train_df = df.sample(frac=.9)
-	train_ids = list(train_df["CommentId"])
-	eval_df = df.where(~df["CommentId"].isin(train_ids)).dropna()
-
-	training_text = train_df["TrainingString"].apply(lambda x: x.replace('\n', '\\n'))
-	eval_text = eval_df["TrainingString"].apply(lambda x: x.replace('\n', '\\n'))
-
-	training_text.to_csv(train_text_file, index=False, header=False, line_terminator='\n', encoding="utf-8")
-	eval_text.to_csv(eval_text_file, index=False, header=False, line_terminator='\n', encoding="utf-8")
-
-	with open(eval_text_file, 'a') as f:
-		text_file = f.read()
-		text_file.replace('"', '')
-		f.close()
-
-	with open(train_text_file, 'a') as f:
-		text_file = f.read()
-		text_file.replace('"', '')
-		f.close()
+	# train_text_file = "train.txt"
+	# eval_text_file = "eval.txt"
+	#
+	# train_df = df.sample(frac=.9)
+	# train_ids = list(train_df["CommentId"])
+	# eval_df = df.where(~df["CommentId"].isin(train_ids)).dropna()
+	#
+	# training_text = train_df["TrainingString"].apply(lambda x: x.replace('\n', '\\n'))
+	# eval_text = eval_df["TrainingString"].apply(lambda x: x.replace('\n', '\\n'))
+	#
+	# training_text.to_csv(train_text_file, index=False, header=False, line_terminator='\n', encoding="utf-8")
+	# eval_text.to_csv(eval_text_file, index=False, header=False, line_terminator='\n', encoding="utf-8")
+	#
+	# with open(eval_text_file, 'a') as f:
+	# 	text_file = f.read()
+	# 	text_file.replace('"', '')
+	# 	f.close()
+	#
+	# with open(train_text_file, 'a') as f:
+	# 	text_file = f.read()
+	# 	text_file.replace('"', '')
+	# 	f.close()
 
 	model_args = {
 		"model_type": "gpt2",
@@ -37,7 +37,7 @@ def main():
 		"learning_rate": 1e-4,
 		# larger batch sizes will use more training data but consume more ram
 		# accumulation steps
-		"gradient_accumulation_steps": 1,
+		"gradient_accumulation_steps": 50,
 
 		# Use text because of grouping by reddit submission
 		"dataset_type": "simple",
@@ -95,7 +95,7 @@ def main():
 	else:
 		model = LanguageModelingModel(model_type=model_args['model_type'], model_name=model_args['model_name'], args=model_args, use_cuda=True, cuda_device="1")
 
-	model.train_model(train_file=train_text_file, eval_file=eval_text_file, args=model_args)
+	model.train_model(train_file="D:\\code\\repos\\quick_training\\only_fans_2_train.txt", eval_file="D:\\code\\repos\\quick_training\\only_fans_2_eval.txt", args=model_args)
 
 
 if __name__ == '__main__':
