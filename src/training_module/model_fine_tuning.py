@@ -1,3 +1,4 @@
+import csv
 from logging import getLogger
 from typing import Tuple
 import torch
@@ -37,21 +38,42 @@ class ModelFineTuner:
 
 	@staticmethod
 	def generate_text_training_data(training_data: str, bot_label: str) -> Tuple[str, str]:
-		df = pandas.read_csv(training_data)
-		train_text_file = f"{bot_label}_train.txt"
-		eval_text_file = f"{bot_label}_eval.txt"
+		train_text_file = f'{bot_label}_train.txt'
+		eval_text_file = f'{bot_label}_eval.txt'
 
-		train_df = df.sample(frac=.9)
-		train_ids = list(train_df["CommentId"])
-		eval_df = df.where(~df["CommentId"].isin(train_ids)).dropna()
+		subreddits = ["onlyfansadvice", "CreatorsAdvice"]
+		df = pandas.read_csv(training_data)
+
+		df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+
+		# Drop unnamed columns
+		df.drop(df.columns[df.columns.str.contains('unnamed', case=False)], axis=1, inplace=True)
+
+		# Clear duplicates
+		df = df.T.drop_duplicates().T
+
+		filtered = df.where(df['CommentBody'] != '[deleted]')
+		filtered.dropna(inplace=True, subset=['Subreddit'])
+
+		filtered = filtered.where(filtered['CommentBody'] != '[removed]')
+		filtered.dropna(inplace=True, subset=['Subreddit'])
+
+		filtered = filtered.where(filtered['Subreddit'].isin(subreddits))
+		filtered.dropna(inplace=True, subset=['Subreddit'])
+
+		train_df = filtered.sample(frac=.9)
+		train_ids = list(train_df['CommentId'])
+
+		eval_df = filtered.where(~filtered['CommentId'].isin(train_ids))
+		eval_df.dropna(inplace=True, subset=['Subreddit'])
 
 		training_text = train_df["TrainingString"].apply(lambda x: x.replace('\n', '\\n'))
 		eval_text = eval_df["TrainingString"].apply(lambda x: x.replace('\n', '\\n'))
 
-		training_text.to_csv(train_text_file, index=False, header=False, line_terminator='\n', encoding="utf-8")
-		eval_text.to_csv(eval_text_file, index=False, header=False, line_terminator='\n', encoding="utf-8")
+		training_text.to_csv(train_text_file, index=False, header=False, line_terminator='\n', encoding="utf-8", escapechar='\\', quoting=csv.QUOTE_NONE)
+		eval_text.to_csv(eval_text_file, index=False, header=False, line_terminator='\n', encoding="utf-8", escapechar='\\', quoting=csv.QUOTE_NONE)
 
-		return "",""
+		return train_text_file, eval_text_file
 
 	@staticmethod
 	def get_training_arguments(bot_label: str) -> dict:
