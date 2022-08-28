@@ -48,7 +48,7 @@ class FineTuningDataCollector:
 						.to_df()
 
 					df = pandas.concat([df, temp_df], ignore_index=True)
-					df.to_csv(f"{output_file}")
+					df.to_csv(output_file)
 					lines_written += 1
 					logger.info(f"{lines_written} new lines written")
 			i += 1

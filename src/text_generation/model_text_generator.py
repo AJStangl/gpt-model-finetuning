@@ -27,7 +27,6 @@ class ModelTextGenerator:
 			device = torch.device(f"cuda:{cuda_device}" if torch.cuda.is_available() else "cpu")
 
 			tokenizer = GPT2Tokenizer.from_pretrained(model_path)
-			prompt_text = unicode(prompt_text, 'utf-8-sig')
 
 			encoded_prompt = tokenizer.encode(prompt_text, add_special_tokens=False, return_tensors="pt")
 
