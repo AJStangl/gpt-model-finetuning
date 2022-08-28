@@ -3,11 +3,12 @@ import torch
 from simpletransformers.language_modeling import LanguageModelingModel
 import os
 
+
 def main():
 	df = pandas.read_csv("training.csv")
 	bot_label = 'only_fans_bot_2'
-	train_text_file = "2_train.txt"
-	eval_text_file = "2_eval.txt"
+	train_text_file = "train.txt"
+	eval_text_file = "eval.txt"
 
 	train_df = df.sample(frac=.9)
 	train_ids = list(train_df["CommentId"])
