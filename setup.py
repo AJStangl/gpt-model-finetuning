@@ -15,7 +15,7 @@ setup(
 	keywords="GPT2",
 	include_package_data=True,
 	url="https://example.com",
-	packages=['src', 'src/reddit', 'src/training_module', 'src/training_module/data_model', 'src/tagging'],
+	packages=['src', 'src/reddit', 'src/training_module', 'src/training_module/data_model', 'src/tagging', 'src/text_generation'],
 	long_description=read('README.md'),
 	classifiers=[
 		"Topic :: Utilities",
