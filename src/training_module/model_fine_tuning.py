@@ -1,7 +1,10 @@
+from logging import getLogger
 from typing import Tuple
 
 import pandas
 from simpletransformers.language_modeling import LanguageModelingModel
+
+logger = getLogger("ModelFineTuner")
 
 
 class ModelFineTuner:

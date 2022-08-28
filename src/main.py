@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import sys
 
 from training_module.training_finetuning_collector import FineTuningDataCollector
 import click
@@ -16,7 +15,7 @@ async def main(subreddit: str):
 if __name__ == '__main__':
 	logging.basicConfig(level=logging.INFO)
 	try:
-		sub = sys.argv[1]
+		sub = "onlyfansadvice"
 		asyncio.run(main(sub))
 	except:
 		logging.error("Specify sub reddit")

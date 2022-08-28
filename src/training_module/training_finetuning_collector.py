@@ -7,9 +7,9 @@ from asyncpraw.models import Subreddit, Comment, Submission
 from asyncpraw.models.comment_forest import CommentForest
 from asyncpraw.models.reddit.base import RedditBase
 
-from reddit.reddit_manager import RedditManager
-from tagging.tagging import Tagging
-from training_module.data_model.training_row import TrainingRow
+from src.reddit.reddit_manager import RedditManager
+from src.tagging.tag import Tagging
+from src.training_module.data_model.training_row import TrainingRow
 
 logger = getLogger("FineTuningDataCollector")
 
