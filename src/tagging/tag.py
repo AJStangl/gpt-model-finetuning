@@ -23,6 +23,11 @@ class Tagging:
 	def __init__(self, reddit: Reddit):
 		self.reddit_instance = reddit
 
+	# TODO: Replace with method that traverses through the a tree representation:
+	# Submission -> Node[Comment[ReplyId]-ReplyId->Node[Comment[ReplyId]]
+	# The current algo does it but uses PRAW to make these calls. It is a 1:1 with what we pass to our actual model but
+	# construction of the training string is needlessly expensive. Mapping a method to get the training string is trivial
+	# what is not is calculating the final token size to ensure we don't go over the model maximum
 	async def collate_tagged_comment_history(self, loop_thing: RedditBase, to_level=12) -> str:
 		"""
 		Loop backwards (upwards in reddit terms) from the praw_thing through the comment up x times,
@@ -62,7 +67,7 @@ class Tagging:
 		Get the reply tag to use.
 		The model will generate text after this reply tag.
 
-		*This section is customisable for your own bot and how it has been finetuned*
+		*This section is customisable for your own bot and how it has been fine-tuned
 		"""
 		try:
 			if isinstance(thing, Comment):

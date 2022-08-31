@@ -5,6 +5,12 @@ class TensorHelper:
 
 	@staticmethod
 	def encode_and_check(tokenizer, prompt) -> Optional[str]:
+		"""
+		TODO: Document this stupid fucking function that is the key to not having your model blow the fuck up.
+		:param tokenizer:
+		:param prompt:
+		:return:
+		"""
 		prompt_text = prompt
 		tokens = tokenizer.tokenize(prompt_text)
 		if len(tokens) > 1024:
