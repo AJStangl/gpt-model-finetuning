@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import Tuple, AsyncGenerator
+from typing import Tuple, AsyncGenerator, Optional
 
 import pandas
 from asyncpraw import Reddit
@@ -14,24 +14,46 @@ from src.training_module.data_model.training_row import TrainingRow
 logger = getLogger("FineTuningDataCollector")
 
 
-class FineTuningDataCollector:
+class FineTuningCollector:
+	"""
+	TODO
+	"""
 	def __init__(self):
+		"""
+		TODO
+		"""
+		pass
+
+
+
+class RedditFineTuningCollector(FineTuningCollector):
+	"""
+	TODO:
+	"""
+	def __init__(self):
+		"""
+		TODO:
+		"""
+		super().__init__()
 		self.__reddit_manager: RedditManager = RedditManager()
 		self.__instance: Reddit = self.__reddit_manager.get_instance()
 		self.__limit: int = 100
+		self.output_file = "training.csv"
 
+	# TODO: Implement get_*_100 methods and implement correct search criteria
 	async def get_top_100(self, subreddit: str, time_filter: str = "month"):
-		output_file: str = "training.csv"
-		df = self._load_previous_dataframe(output_file)
+		# TODO: Make configurable (maybe)
+		df = self._load_previous_dataframe(self.output_file)
 		tagging: Tagging = Tagging(self.__instance)
 		subreddit: Subreddit = await self.__instance.subreddit(subreddit)
 		i = 0
 		lines_written = 0
+		# TODO: Make async iterator
 		async for submission in subreddit.top(time_filter=time_filter, limit=self.__limit):
-			# submission.link_flair_text.strip().lower()
 			logger.info(f"{i}/{self.__limit} Submissions completed")
 			async for comments in self._get_all_comments(submission):
 				for comment in comments:
+					# TODO: Introduce configuration filter for this
 					if self._comment_exists_in_dataframe(df, comment.id):
 						continue
 
@@ -48,14 +70,32 @@ class FineTuningDataCollector:
 						.to_df()
 
 					df = pandas.concat([df, temp_df], ignore_index=True)
-					df.to_csv(output_file)
+					df.to_csv(self.output_file)
 					lines_written += 1
 					logger.info(f"{lines_written} new lines written")
 			i += 1
 		await self.__instance.close()
 
+	def _load_previous_dataframe(self, output_file: str) -> pandas.DataFrame:
+		"""
+		TODO:
+		:param output_file:
+		:return:
+		"""
+		try:
+			df = pandas.read_csv(output_file)
+			df = self._clean_previous_dataframe(data_frame=df)
+			return df
+		except FileNotFoundError:
+			return pandas.DataFrame(columns=TrainingRow.get_header_columns())
+
 	@staticmethod
 	async def _set_parent_information(comment: Comment) -> Tuple[str, str, str]:
+		"""
+
+		:param comment:
+		:return:
+		"""
 		parent: RedditBase = await comment.parent()
 
 		if isinstance(parent, Submission):
@@ -69,19 +109,38 @@ class FineTuningDataCollector:
 		return "", "", ""
 
 	@staticmethod
-	async def _get_all_comments(submission: Submission) -> AsyncGenerator:
+	async def _get_all_comments(submission: Submission, limit: Optional[int] = None) -> AsyncGenerator:
+		"""
+
+		:param submission:
+		:param limit:
+		:return:
+		"""
 		comments: CommentForest = await submission.comments()
-		await comments.replace_more(limit=None)
+		await comments.replace_more(limit=limit)
 		yield comments.list()
 
 	@staticmethod
-	def _load_previous_dataframe(output_file: str) -> pandas.DataFrame:
-		try:
-			df = pandas.read_csv(output_file)
-			return df
-		except FileNotFoundError:
-			return pandas.DataFrame(columns=TrainingRow.get_header_columns())
+	def _comment_exists_in_dataframe(dataframe: pandas.DataFrame, commentId) -> bool:
+		"""
+		TODO:
+		:param dataframe:
+		:param commentId:
+		:return:
+		"""
+		return commentId in set(dataframe['CommentId'])
 
 	@staticmethod
-	def _comment_exists_in_dataframe(dataframe: pandas.DataFrame, commentId) -> bool:
-		return commentId in set(dataframe['CommentId'])
+	def _clean_previous_dataframe(data_frame: pandas.DataFrame) -> pandas.DataFrame:
+		"""
+		TODO
+		:param data_frame:
+		:return:
+		"""
+		data_frame = data_frame.loc[:, ~data_frame.columns.str.contains('^Unnamed')]
+		# Drop unnamed columns
+		data_frame.drop(data_frame.columns[data_frame.columns.str.contains('unnamed', case=False)], axis=1, inplace=True)
+
+		# Clear duplicates
+		data_frame = data_frame.T.drop_duplicates().T
+		return data_frame

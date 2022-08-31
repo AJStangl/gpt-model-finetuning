@@ -1,6 +1,5 @@
 import codecs
 import logging
-import os
 import re
 
 import ftfy
@@ -120,7 +119,8 @@ class Tagging:
 
 		return tag + self._title_start_tag
 
-	async def tag_submission(self, submission: Submission):
+	@staticmethod
+	async def tag_submission(submission: Submission):
 		tagged_text = ""
 
 		try:
@@ -199,7 +199,8 @@ class Tagging:
 			logging.error(f"{e} in tag_comment")
 			return f'<|sor|>{comment.body}<|eor|>'
 
-	def tag_message(self, thing, use_reply_sense=True):
+	@staticmethod
+	def tag_message(thing, use_reply_sense=True):
 
 		tagged_text = ""
 
@@ -335,7 +336,7 @@ class Tagging:
 			parent = await base.parent()
 			await parent.load()
 		except Exception as e:
-			logging.error(f"Error attempting to get the parent from base {e } in get_parent_of_parent")
+			logging.error(f"Error attempting to get the parent from base {e} in get_parent_of_parent")
 			return base
 
 		# if it's a submission then return the submission

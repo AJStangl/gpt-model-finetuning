@@ -1,13 +1,19 @@
+from typing import Optional
+
 import torch
 import time
 from logging import getLogger
 
-from numpy import unicode
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
 
 logger = getLogger("ModelTextGenerator")
 
+
 class ModelTextGenerator:
+	"""
+
+	"""
+
 	def __init__(self):
 		self.text_generation_parameters = {
 			'max_length': 1024,
@@ -77,29 +83,61 @@ class ModelTextGenerator:
 		finally:
 			pass
 
-	def generate_simple_text(self, model_path: str, prompt: str, cuda_device: int = 1):
+	# TODO DEFINE CONFIGURATION CLASS
+	def simple_text_generation(self, model_path: str, tokenizer_path: str, prompt: str, cuda_device: int = 1,
+							   model_config: Optional[dict] = None):
+		"""
 
-		device = torch.device(f"cuda:{cuda_device}" if torch.cuda.is_available() else "cpu")
+		:param model_path:
+		:param prompt:
+		:param cuda_device:
+		:param model_config:
+		:return:
+		"""
+		start_time = time.time()
+		try:
+			device = torch.device(f"cuda:{cuda_device}" if torch.cuda.is_available() else "cpu")
 
-		tokenizer = GPT2Tokenizer.from_pretrained(model_path)
+			tokenizer = GPT2Tokenizer.from_pretrained(tokenizer_path)
 
-		model = GPT2LMHeadModel.from_pretrained(model_path)
-		model.to(device)
+			model = GPT2LMHeadModel.from_pretrained(model_path)
 
-		foo = "<|soss r/onlyHams|><|sot|>Stop having issues<|eot|><|sost|>Just stop it.<|eost|><|soopr u/arzen221|>the tests will continue until the problem is corrected.<|eoopr|><|soopr|>"
-		generated = tokenizer(f"<|startoftext|> {foo}", return_tensors="pt")
+			generated = tokenizer(f"<|startoftext|> {prompt}", return_tensors="pt")
 
-		sample_outputs = model.generate(inputs=generated.input_ids.to(device),
-										attention_mask=generated['attention_mask'].to(device),
-										do_sample=True, top_k=40,
-										max_length=1024,
-										top_p=0.8,
-										temperature=0.8,
-										num_return_sequences=1,
-										repetition_penalty=1.08,
-										stop_token='<|endoftext|>')
-		results = []
-		for i, sample_output in enumerate(sample_outputs):
-			result = tokenizer.decode(sample_output, skip_special_tokens=True)
-			result.append(result.replace(prompt, ""))
-		return results[0]
+			model.to(device)
+
+			inputs = generated.input_ids.to(device)
+
+			attention_mask = generated['attention_mask'].to(device)
+
+			sample_outputs = model.generate(inputs=inputs,
+											attention_mask=attention_mask,
+											do_sample=True, top_k=40,
+											max_length=1024,
+											top_p=0.8,
+											temperature=0.8,
+											num_return_sequences=1,
+											repetition_penalty=1.08,
+											stop_token='<|endoftext|>')
+
+			results = []
+			for i, sample_output in enumerate(sample_outputs):
+				result = tokenizer.decode(sample_output, skip_special_tokens=True)
+				result.append(result.replace(prompt, ""))
+
+			end_time = time.time()
+			duration = round(end_time - start_time, 1)
+
+			selected_result = results[0]
+
+			print(f'{len(results[0])} sample(s) of text generated in {duration} seconds.')
+
+			return selected_result
+
+		except Exception as e:
+			logger.error(f":: An error has occurred while attempting to generate text")
+			logger.error(e)
+			raise e
+		finally:
+			# TODO: Garbage cleanup
+			pass
