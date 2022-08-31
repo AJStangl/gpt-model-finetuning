@@ -1,11 +1,10 @@
 import logging
-from logging import getLogger
 
 import asyncclick as click
 
 from src.text_generation.model_text_generator import ModelTextGenerator
 from src.training_module.model_fine_tuning import ModelFineTuner
-from src.training_module.training_finetuning_collector import FineTuningDataCollector
+from src.training_module.training_finetuning_collector import RedditFineTuningCollector
 
 
 @click.group()
@@ -24,10 +23,10 @@ def cli3():
 
 
 @cli1.command()
-@click.option("--sub", prompt='specify a single subreddit name', default='onlyfansadvice')
+@click.option("--sub", prompt='specify a single subreddit name', default='')
 async def download_data(sub: str):
-	"""Command for downloading finetuning data"""
-	collector: FineTuningDataCollector = FineTuningDataCollector()
+	"""Command for downloading fine-tuning data"""
+	collector: RedditFineTuningCollector = RedditFineTuningCollector()
 	subs = sub.split(",")
 	for sub in subs:
 		await collector.get_top_100(subreddit=sub)
