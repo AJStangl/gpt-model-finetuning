@@ -70,6 +70,7 @@ class RedditFineTuningCollector(FineTuningCollector):
 						.to_df()
 
 					df = pandas.concat([df, temp_df], ignore_index=True)
+
 					df.to_csv(self.output_file)
 					lines_written += 1
 					logger.info(f"{lines_written} new lines written")
@@ -137,10 +138,10 @@ class RedditFineTuningCollector(FineTuningCollector):
 		:param data_frame:
 		:return:
 		"""
-		data_frame = data_frame.loc[:, ~data_frame.columns.str.contains('^Unnamed')]
-		# Drop unnamed columns
-		data_frame.drop(data_frame.columns[data_frame.columns.str.contains('unnamed', case=False)], axis=1, inplace=True)
-
-		# Clear duplicates
-		data_frame = data_frame.T.drop_duplicates().T
+		# data_frame = data_frame.loc[:, ~data_frame.columns.str.contains('^Unnamed')]
+		# # Drop unnamed columns
+		# data_frame.drop(data_frame.columns[data_frame.columns.str.contains('unnamed', case=False)], axis=1, inplace=True)
+		#
+		# # Clear duplicates
+		# data_frame = data_frame.T.drop_duplicates().T
 		return data_frame
