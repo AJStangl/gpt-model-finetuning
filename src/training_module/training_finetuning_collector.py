@@ -37,12 +37,11 @@ class RedditFineTuningCollector(FineTuningCollector):
 		self.__reddit_manager: RedditManager = RedditManager()
 		self.__instance: Reddit = self.__reddit_manager.get_instance()
 		self.__limit: int = 100
-		self.output_file = "training.csv"
 
 	# TODO: Implement get_*_100 methods and implement correct search criteria
-	async def get_top_100(self, subreddit: str, time_filter: str = "month"):
+	async def get_top_100(self, subreddit: str, time_filter: str = "month", output_file: str = "training.csv"):
 		# TODO: Make configurable (maybe)
-		df = self._load_previous_dataframe(self.output_file)
+		df = self._load_previous_dataframe(output_file)
 		tagging: Tagging = Tagging(self.__instance)
 		subreddit: Subreddit = await self.__instance.subreddit(subreddit)
 		i = 0
@@ -70,7 +69,7 @@ class RedditFineTuningCollector(FineTuningCollector):
 
 					df = pandas.concat([df, temp_df], ignore_index=True)
 
-					df.to_csv(self.output_file)
+					df.to_csv(output_file)
 					lines_written += 1
 					logger.info(f"{lines_written} new lines written")
 			i += 1
