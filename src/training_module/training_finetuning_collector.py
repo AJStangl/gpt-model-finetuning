@@ -52,7 +52,6 @@ class FineTuningDataCollector:
 					lines_written += 1
 					logger.info(f"{lines_written} new lines written")
 			i += 1
-
 		await self.__instance.close()
 
 	@staticmethod

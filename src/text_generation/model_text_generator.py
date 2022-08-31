@@ -76,3 +76,30 @@ class ModelTextGenerator:
 			raise e
 		finally:
 			pass
+
+	def generate_simple_text(self, model_path: str, prompt: str, cuda_device: int = 1):
+
+		device = torch.device(f"cuda:{cuda_device}" if torch.cuda.is_available() else "cpu")
+
+		tokenizer = GPT2Tokenizer.from_pretrained(model_path)
+
+		model = GPT2LMHeadModel.from_pretrained(model_path)
+		model.to(device)
+
+		foo = "<|soss r/onlyHams|><|sot|>Stop having issues<|eot|><|sost|>Just stop it.<|eost|><|soopr u/arzen221|>the tests will continue until the problem is corrected.<|eoopr|><|soopr|>"
+		generated = tokenizer(f"<|startoftext|> {foo}", return_tensors="pt")
+
+		sample_outputs = model.generate(inputs=generated.input_ids.to(device),
+										attention_mask=generated['attention_mask'].to(device),
+										do_sample=True, top_k=40,
+										max_length=1024,
+										top_p=0.8,
+										temperature=0.8,
+										num_return_sequences=1,
+										repetition_penalty=1.08,
+										stop_token='<|endoftext|>')
+		results = []
+		for i, sample_output in enumerate(sample_outputs):
+			result = tokenizer.decode(sample_output, skip_special_tokens=True)
+			result.append(result.replace(prompt, ""))
+		return results[0]
