@@ -26,3 +26,6 @@
 /*eval.txt
 /*train.txt
 /src/cache_dir/
+/results/**
+/results
+/results/*

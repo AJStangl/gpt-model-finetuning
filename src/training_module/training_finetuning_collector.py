@@ -25,7 +25,6 @@ class FineTuningCollector:
 		pass
 
 
-
 class RedditFineTuningCollector(FineTuningCollector):
 	"""
 	TODO:
