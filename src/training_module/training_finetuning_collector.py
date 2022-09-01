@@ -39,7 +39,15 @@ class RedditFineTuningCollector(FineTuningCollector):
 		self.__limit: int = 100
 
 	# TODO: Implement get_*_100 methods and implement correct search criteria
-	async def get_top_100(self, subreddit: str, time_filter: str = "month", output_file: str = "training.csv"):
+	async def get_top_100(self, subreddit: str, time_filter: str = "month", output_file: str = "training.csv", inline_training_generation: bool = True):
+		"""
+		TODO:
+		:param subreddit:
+		:param time_filter:
+		:param output_file:
+		:param inline_training_generation:
+		:return:
+		"""
 		# TODO: Make configurable (maybe)
 		df = self._load_previous_dataframe(output_file)
 		tagging: Tagging = Tagging(self.__instance)
@@ -55,7 +63,10 @@ class RedditFineTuningCollector(FineTuningCollector):
 					if self._comment_exists_in_dataframe(df, comment.id):
 						continue
 
-					result = await tagging.collate_tagged_comment_history(comment)
+					if inline_training_generation:
+						result = await tagging.collate_tagged_comment_history(comment)
+					else:
+						result = None
 
 					parent_id, parent_author, parent_body = await self._set_parent_information(comment)
 
