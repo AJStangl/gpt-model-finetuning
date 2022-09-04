@@ -4,7 +4,7 @@ from typing import Optional
 class TensorHelper:
 
 	@staticmethod
-	def encode_and_check(tokenizer, prompt, cuda_device=None) -> Optional[str]:
+	def encode_and_check(tokenizer, prompt) -> Optional[str]:
 		"""
 		TODO: Document this stupid fucking function that is the key to not having your model blow the fuck up.
 		:param tokenizer:

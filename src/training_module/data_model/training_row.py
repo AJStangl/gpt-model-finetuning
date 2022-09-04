@@ -17,8 +17,7 @@ class TrainingRow(object):
 
 	@staticmethod
 	def get_header_columns() -> [str]:
-		return ["Subreddit", "SubmissionId", "ParentId", "ParentAuthor", "ParentBody", "CommentId", "CommentBody",
-				"TrainingString"]
+		return ["Subreddit", "SubmissionId", "ParentId", "ParentAuthor", "ParentBody", "CommentId", "CommentBody", "TrainingString"]
 
 	def set_subreddit_information(self, subreddit: Subreddit):
 		self.Subreddit = subreddit.display_name
@@ -42,7 +41,7 @@ class TrainingRow(object):
 
 	def set_training_text(self, training: str):
 		text = self.clean_text(training)
-		self.TrainingString = text + '<|endoftext|>'
+		self.TrainingString = text
 		return self
 
 	def to_df(self) -> pandas.DataFrame:

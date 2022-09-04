@@ -39,7 +39,7 @@ class RedditFineTuningCollector(FineTuningCollector):
 		self.__limit: int = 100
 
 	# TODO: Implement get_*_100 methods and implement correct search criteria
-	async def get_top_100(self, subreddit: str, time_filter: str = "month", output_file: str = "training.json", inline_training_generation: bool = True):
+	async def get_top_100(self, subreddit: str, time_filter: str = "month", output_file: str = "training.csv", inline_training_generation: bool = True):
 		"""
 		TODO:
 		:param subreddit:
@@ -80,8 +80,7 @@ class RedditFineTuningCollector(FineTuningCollector):
 
 					df = pandas.concat([df, temp_df], ignore_index=True)
 
-					df.to_json("training.json", orient='records', indent=4, force_ascii=False)
-
+					df.to_csv(output_file)
 					lines_written += 1
 					logger.info(f"{lines_written} new lines written")
 			i += 1
@@ -94,7 +93,7 @@ class RedditFineTuningCollector(FineTuningCollector):
 		:return:
 		"""
 		try:
-			df = pandas.read_json(output_file, encoding='utf-8', orient='records')
+			df = pandas.read_csv(output_file)
 			df = self._clean_previous_dataframe(data_frame=df)
 			return df
 		except FileNotFoundError:
