@@ -6,6 +6,8 @@ from torch.utils.data import Dataset, random_split
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
 from transformers import TrainingArguments, Trainer
 
+from src.tensor_encoding.tensor_encoding import TensorHelper
+
 
 class RedditDataset(Dataset):
 	"""
@@ -28,8 +30,7 @@ class RedditDataset(Dataset):
 
 	# TODO: Pass Configure training arguments...
 	def fine_tunining_new_model(self) -> None:
-		tokenizer = GPT2Tokenizer.from_pretrained('gpt2', bos_token='<|startoftext|>', eos_token='<|endoftext|>',
-												  pad_token='<|pad|>')
+		tokenizer = GPT2Tokenizer.from_pretrained('gpt2', bos_token='<|startoftext|>', eos_token='<|endoftext|>', pad_token='<|pad|>')
 
 		tokenizer.save_pretrained('./results')
 
@@ -41,7 +42,7 @@ class RedditDataset(Dataset):
 
 		valid_prompts = []
 		for conversation in conversations:
-			encoded = ArgHelper.encode_and_check(tokenizer, conversation)
+			encoded = TensorHelper().encode_and_check(tokenizer, conversation)
 			if encoded is not None:
 				valid_prompts.append(encoded)
 

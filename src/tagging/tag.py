@@ -9,6 +9,10 @@ from asyncpraw.models.reddit.base import RedditBase
 
 
 class Tagging:
+	"""
+	TODO: Describe this class
+	"""
+
 	_link_submission_start_tag = '<|sols|>'
 	_selftext_submission_start_tag = '<|soss|>'
 
