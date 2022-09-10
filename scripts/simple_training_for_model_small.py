@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
 	valid_prompts = []
 	for conversation in conversations:
-		encoded = TensorHelper.encode_and_check(tokenizer, conversation)
+		encoded = TensorHelper.token_length_appropriate(tokenizer, conversation)
 		if encoded is not None:
 			valid_prompts.append(encoded)
 

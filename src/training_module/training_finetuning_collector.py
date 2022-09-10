@@ -6,9 +6,11 @@ from asyncpraw import Reddit
 from asyncpraw.models import Subreddit, Comment, Submission
 from asyncpraw.models.comment_forest import CommentForest
 from asyncpraw.models.reddit.base import RedditBase
+from transformers import GPT2Tokenizer
 
 from src.reddit.reddit_manager import RedditManager
 from src.tagging.tag import Tagging
+from src.tensor_encoding.tensor_encoding import TensorHelper
 from src.training_module.data_model.training_row import TrainingRow
 
 logger = getLogger("FineTuningDataCollector")
@@ -27,7 +29,7 @@ class FineTuningCollector:
 
 class RedditFineTuningCollector(FineTuningCollector):
 	"""
-	TODO:
+	Provides an interface to obtain training strings from reddit provided the exposed search methods.
 	"""
 	def __init__(self):
 		"""
@@ -37,24 +39,25 @@ class RedditFineTuningCollector(FineTuningCollector):
 		self.__reddit_manager: RedditManager = RedditManager()
 		self.__instance: Reddit = self.__reddit_manager.get_instance()
 		self.__limit: int = 100
+		self.__tokenizer: GPT2Tokenizer = GPT2Tokenizer.from_pretrained("gpt-2")
 
 	# TODO: Implement get_*_100 methods and implement correct search criteria
-	async def get_top_100(self, subreddit: str, time_filter: str = "month", output_file: str = "training.csv", inline_training_generation: bool = True):
+	async def get_top_100(self, subreddit: str, time_filter: str = "month", output_file: str = "training.csv", inline_training_generation: bool = True) -> None:
 		"""
 		TODO:
-		:param subreddit:
-		:param time_filter:
-		:param output_file:
-		:param inline_training_generation:
-		:return:
+		:param subreddit: The subreddit to collect submissions for
+		:param time_filter: The type of filter for submission: month, day, year
+		:param output_file: The path to the output file generated
+		:param inline_training_generation: Performs construction of the training string
+		:return: None
 		"""
-		# TODO: Make configurable (maybe)
 		df = self._load_previous_dataframe(output_file)
 		tagging: Tagging = Tagging(self.__instance)
 		subreddit: Subreddit = await self.__instance.subreddit(subreddit)
+		helper: TensorHelper = TensorHelper(self.__tokenizer)
+
 		i = 0
 		lines_written = 0
-		# TODO: Make async iterator
 		async for submission in subreddit.top(time_filter=time_filter, limit=self.__limit):
 			logger.info(f"{i}/{self.__limit} Submissions completed")
 			async for comments in self._get_all_comments(submission):
@@ -65,6 +68,10 @@ class RedditFineTuningCollector(FineTuningCollector):
 
 					if inline_training_generation:
 						result = await tagging.collate_tagged_comment_history(comment)
+						if not helper.token_length_appropriate(result):
+							result = None
+						else:
+							pass
 					else:
 						result = None
 
@@ -121,10 +128,10 @@ class RedditFineTuningCollector(FineTuningCollector):
 	@staticmethod
 	async def _get_all_comments(submission: Submission, limit: Optional[int] = None) -> AsyncGenerator:
 		"""
-
-		:param submission:
-		:param limit:
-		:return:
+		Resolves the entire comment forest for a submission and yields the async generator for iteration
+		:param submission: The submission object
+		:param limit: Total limit of submissions, default to none (max)
+		:return: AsyncGenerator
 		"""
 		comments: CommentForest = await submission.comments()
 		await comments.replace_more(limit=limit)
@@ -133,19 +140,19 @@ class RedditFineTuningCollector(FineTuningCollector):
 	@staticmethod
 	def _comment_exists_in_dataframe(dataframe: pandas.DataFrame, commentId) -> bool:
 		"""
-		TODO:
-		:param dataframe:
-		:param commentId:
-		:return:
+		Checks to see if a commentId is present in the file. Returns true if it exists
+		:param dataframe: The dataframe to act on
+		:param commentId: The id for the comment
+		:return: True is in dataframe
 		"""
 		return commentId in set(dataframe['CommentId'])
 
 	@staticmethod
 	def _clean_previous_dataframe(data_frame: pandas.DataFrame) -> pandas.DataFrame:
 		"""
-		TODO
-		:param data_frame:
-		:return:
+		Removes unnamed columns from the training file if present.
+		:param data_frame: The dataframe to act on
+		:return: The dataframe acted on
 		"""
 		data_frame = data_frame.loc[:, ~data_frame.columns.str.contains('^Unnamed')]
 		return data_frame
