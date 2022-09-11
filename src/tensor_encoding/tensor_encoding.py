@@ -16,7 +16,7 @@ class TensorHelper:
 	"""
 	MAX_TOKEN_LIMIT: int = 1024
 
-	def __init__(self, tokenizer: Optional[PreTrainedTokenizer]):
+	def __init__(self, tokenizer: Optional[PreTrainedTokenizer] = None):
 		self.__tokenizer = tokenizer or GPT2Tokenizer.from_pretrained("gpt2")
 
 	def token_length_appropriate(self, prompt) -> bool:
