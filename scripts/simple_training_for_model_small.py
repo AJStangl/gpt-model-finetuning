@@ -4,7 +4,7 @@ import os
 
 import pandas
 import torch
-from src.tensor_encoding.tensor_encoding import TensorHelper
+from src.tensor_encoding.tensor_encoding import TokenizerAdapter
 from src.datasets.reddit_dataset import RedditDataset
 from torch.utils.data import Dataset, random_split
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
 	valid_prompts = []
 	for conversation in conversations:
-		encoded = TensorHelper.token_length_appropriate(tokenizer, conversation)
+		encoded = TokenizerAdapter.token_length_appropriate(tokenizer, conversation)
 		if encoded is not None:
 			valid_prompts.append(encoded)
 

@@ -3,7 +3,7 @@ import logging
 
 import pandas
 
-from src.tensor_encoding.tensor_encoding import TensorHelper
+from src.tensor_encoding.tensor_encoding import TokenizerAdapter
 from src.training_module.training_finetuning_collector import RedditFineTuningCollector
 
 
@@ -17,7 +17,7 @@ async def main():
 	logging.info(f"=== Process Complete ===")
 
 def filter_token_length():
-	helper: TensorHelper = TensorHelper(tokenizer=None)
+	helper: TokenizerAdapter = TokenizerAdapter(tokenizer=None)
 	df = pandas.read_csv("training.csv", encoding='utf-8')
 	training_string_series = df["TrainingString"]
 	training_string_series.where(lambda x: helper.token_length_appropriate(x), inplace=True)

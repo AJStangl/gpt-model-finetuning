@@ -4,7 +4,7 @@ import os
 
 import pandas
 import torch
-from src.tensor_encoding.tensor_encoding import TensorHelper
+from src.tensor_encoding.tensor_encoding import TokenizerAdapter
 from src.datasets.reddit_dataset import RedditDataset
 from torch.utils.data import Dataset, random_split
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
@@ -19,7 +19,7 @@ from transformers import GPT2Tokenizer, GPT2LMHeadModel
 from transformers import TrainingArguments, Trainer
 
 from src.datasets.reddit_dataset import RedditDataset
-from src.tensor_encoding.tensor_encoding import TensorHelper
+from src.tensor_encoding.tensor_encoding import TokenizerAdapter
 
 
 def main():
@@ -44,7 +44,7 @@ def main():
 	valid_prompts = []
 	logging.info(":: Checking encodings...")
 	for prompt in prompts:
-		# encoded = TensorHelper.encode_and_check(tokenizer, prompt)
+		# encoded = TokenizerAdapter.encode_and_check(tokenizer, prompt)
 		if prompt is not None:
 			valid_prompts.append(prompt)
 

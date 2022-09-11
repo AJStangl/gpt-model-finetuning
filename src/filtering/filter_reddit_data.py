@@ -1,9 +1,9 @@
-from src.tensor_encoding.tensor_encoding import TensorHelper
+from src.tensor_encoding.tensor_encoding import TokenizerAdapter
 
 
 class RedditDataFilter:
 	def __init__(self):
-		self.tensor_helper = TensorHelper()
+		self.tensor_helper = TokenizerAdapter()
 
 
 	def has_valid_line(self, input: str, tokenizer) -> bool:

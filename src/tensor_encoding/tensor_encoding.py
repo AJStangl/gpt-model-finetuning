@@ -1,32 +1,32 @@
 from logging import getLogger
-from typing import Optional
+from typing import List
+from transformers.tokenization_utils_base import TextInput
 
-from transformers import GPT2Tokenizer, PreTrainedTokenizer
-
-logger = getLogger("TensorHelper")
+logger = getLogger("TokenizerAdapter")
 
 
-class TensorHelper:
+class TokenizerAdapter:
 	"""
 	Provides an interface to tokenization related activities. Intended to be extended on from this type.
 	"""
 
-	"""
-	Private constant for maximum acceptable length of GPT-2 models. Perhaps this requires further abstraction. 
-	"""
+	# Private constant for maximum acceptable length of GPT-2 models. Perhaps this requires further abstraction
 	MAX_TOKEN_LIMIT: int = 1024
 
-	def __init__(self, tokenizer: Optional[PreTrainedTokenizer] = None):
-		self.__tokenizer = tokenizer or GPT2Tokenizer.from_pretrained("gpt2")
+	def __init__(self, tokenizer):
+		self.__tokenizer = tokenizer
+
+	def tokenize(self, text: TextInput, **kwargs) -> List[str]:
+		"""Wrapper for direct call to provider tokenizer tokenize method"""
+		return self.__tokenizer.tokenize(text, **kwargs)
 
 	def token_length_appropriate(self, prompt) -> bool:
 		"""
 		Ensures that the total number of encoded tokens is within acceptable limits.
-		:param tokenizer: An instance of the tokenizer being used.
 		:param prompt: UTF-8 Text that is assumed to have been processed.
 		:return: True if acceptable.
 		"""
-		tokens = self.__tokenizer.tokenize(prompt)
+		tokens = self.tokenize(prompt)
 		if len(tokens) > self.MAX_TOKEN_LIMIT:
 			logger.debug(f":: Tokens for model input is > {1024}. Skipping input")
 			return False

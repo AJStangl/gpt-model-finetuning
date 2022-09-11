@@ -10,7 +10,7 @@ from transformers import GPT2Tokenizer
 
 from src.reddit.reddit_manager import RedditManager
 from src.tagging.tag import Tagging
-from src.tensor_encoding.tensor_encoding import TensorHelper
+from src.tensor_encoding.tensor_encoding import TokenizerAdapter
 from src.training_module.data_model.training_row import TrainingRow
 
 logger = getLogger("FineTuningDataCollector")
@@ -54,7 +54,7 @@ class RedditFineTuningCollector(FineTuningCollector):
 		df = self._load_previous_dataframe(output_file)
 		tagging: Tagging = Tagging(self.__instance)
 		subreddit: Subreddit = await self.__instance.subreddit(subreddit)
-		helper: TensorHelper = TensorHelper(self.__tokenizer)
+		helper: TokenizerAdapter = TokenizerAdapter(self.__tokenizer)
 
 		i = 0
 		lines_written = 0
