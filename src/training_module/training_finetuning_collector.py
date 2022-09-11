@@ -39,7 +39,7 @@ class RedditFineTuningCollector(FineTuningCollector):
 		self.__reddit_manager: RedditManager = RedditManager()
 		self.__instance: Reddit = self.__reddit_manager.get_instance()
 		self.__limit: int = 100
-		self.__tokenizer: GPT2Tokenizer = GPT2Tokenizer.from_pretrained("gpt-2")
+		self.__tokenizer: GPT2Tokenizer = GPT2Tokenizer.from_pretrained("gpt2-medium")
 
 	# TODO: Implement get_*_100 methods and implement correct search criteria
 	async def get_top_100(self, subreddit: str, time_filter: str = "month", output_file: str = "training.csv", inline_training_generation: bool = True) -> None:

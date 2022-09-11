@@ -8,19 +8,21 @@ from src.training_module.training_finetuning_collector import RedditFineTuningCo
 
 
 async def main():
-	subs = open("subreddits.txt", "r").read().split(",")
+	# subs = open("subreddits.txt", "r").read().split(",")
+	subs = ['wallstreetbets', 'DoesAnybodyElse', 'whatisthisthing']
 	logging.info(": Processing the following subreddits")
 	for sub in subs:
 		logging.info(f"=== Starting Collection For {sub} ===")
-		await RedditFineTuningCollector().get_top_100(subreddit=sub, time_filter="month", output_file="training.csv")
+		await RedditFineTuningCollector()\
+			.get_top_100(subreddit=sub, time_filter="month", output_file="coop_training.csv")
 		logging.info(f"=== Subreddit completed {sub} ===")
 	logging.info(f"=== Process Complete ===")
 
-def filter_token_length():
-	helper: TokenizerAdapter = TokenizerAdapter(tokenizer=None)
-	df = pandas.read_csv("training.csv", encoding='utf-8')
-	training_string_series = df["TrainingString"]
-	training_string_series.where(lambda x: helper.token_length_appropriate(x), inplace=True)
+# def filter_token_length():
+# 	helper: TokenizerAdapter = TokenizerAdapter(tokenizer=None)
+# 	df = pandas.read_csv("coop_training.csv", encoding='utf-8')
+# 	training_string_series = df["TrainingString"]
+# 	training_string_series.where(lambda x: helper.token_length_appropriate(x), inplace=True)
 
 
 
